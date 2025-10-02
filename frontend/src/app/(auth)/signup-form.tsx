@@ -3,8 +3,36 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
+import * as Yup from "yup";
+
+const signupSchema = Yup.object({
+    firstName: Yup.string().max(15, "Must be 15 characters or less").required("First name is required"),
+    lastName: Yup.string().max(20, "Must be 20 characters or less").required("Last name is required"),
+    email: Yup.string().email("Invalid email address").required("Email is required"),
+    password: Yup.string().required("Password is required"),
+    confirmPassword: Yup.string()
+        .required("Confirm password is required")
+        .oneOf([Yup.ref("password")], "Passwords must match"),
+    agreeTerms: Yup.boolean().required("Agree to terms is required"),
+});
 
 export default function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
+    const router = useRouter();
+
+    const formik = useFormik({
+        initialValues: {
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+        },
+        validationSchema: signupSchema,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        onSubmit: async (value) => {},
+    });
+
     return (
         <form className={cn("flex flex-col gap-6", className)} {...props}>
             <div className="flex flex-col items-center gap-2 text-center">
@@ -13,18 +41,46 @@ export default function SignupForm({ className, ...props }: React.ComponentProps
             </div>
             <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
-                    <Input name="firstName" type="text" label="First Name" required />
-                    <Input name="lastName" type="text" label="Last Name" required />
+                    <Input
+                        name="firstName"
+                        type="text"
+                        label="First Name"
+                        value={formik.values.firstName}
+                        onChange={formik.handleChange}
+                        error={formik.errors.firstName}
+                    />
+                    <Input
+                        name="lastName"
+                        type="text"
+                        label="Last Name"
+                        value={formik.values.lastName}
+                        onChange={formik.handleChange}
+                        error={formik.errors.lastName}
+                    />
                 </div>
-                <Input name="email" type="email" label="Email" required />
-                <Input name="password" type="password" label="Password" required />
+                <Input
+                    name="email"
+                    type="email"
+                    label="Email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    error={formik.errors.email}
+                />
+                <Input
+                    name="password"
+                    type="password"
+                    label="Password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    error={formik.errors.password}
+                />
                 <div className="my-2 flex items-center gap-2">
                     <Checkbox id="terms" />
                     <Label htmlFor="terms" className="text-muted-foreground">
                         Accept terms and conditions
                     </Label>
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" loading={formik.isSubmitting}>
                     Sign Up
                 </Button>
             </div>

@@ -1,9 +1,31 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useFormik } from "formik";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import * as Yup from "yup";
+
+const signinSchema = Yup.object({
+    email: Yup.string().email("Invalid email address").required("Email is required"),
+    password: Yup.string().required("Password is required"),
+});
 
 export default function SigninForm({ className, ...props }: React.ComponentProps<"form">) {
+    const router = useRouter();
+
+    const formik = useFormik({
+        initialValues: {
+            email: "",
+            password: "",
+        },
+        validationSchema: signinSchema,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        onSubmit: async (value) => {},
+    });
+
     return (
         <form className={cn("flex flex-col gap-6", className)} {...props}>
             <div className="flex flex-col items-center gap-2 text-center">
@@ -11,15 +33,29 @@ export default function SigninForm({ className, ...props }: React.ComponentProps
                 <p className="text-muted-foreground text-balance">Please enter your details to sign in</p>
             </div>
             <div className="grid gap-4">
-                <Input name="email" type="email" label="Email" required />
-                <Input name="password" type="password" label="Password" required />
+                <Input
+                    name="email"
+                    type="email"
+                    label="Email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    error={formik.errors.email}
+                />
+                <Input
+                    name="password"
+                    type="password"
+                    label="Password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    error={formik.errors.password}
+                />
                 <div className="my-2 flex justify-between items-center gap-4">
                     <div></div>
                     <Link href="/forgot-password" className="text-primary">
                         Forgot Password?
                     </Link>
                 </div>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" loading={formik.isSubmitting}>
                     Sign In
                 </Button>
                 <Button variant="outline" className="w-full">
