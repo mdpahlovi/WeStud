@@ -1,29 +1,23 @@
-import { Outfit, Plus_Jakarta_Sans } from "next/font/google";
-
 import "./globals.css";
 
-export const plusJakartaSans = Plus_Jakarta_Sans({
-    weight: ["400"],
+import { Poppins } from "next/font/google";
+
+export const poppins = Poppins({
+    weight: ["400", "500", "600", "700", "800", "900"],
     subsets: ["latin"],
-    variable: "--font-plus-jakarta-sans",
-});
-export const outfit = Outfit({
-    weight: ["600", "700"],
-    subsets: ["latin"],
-    variable: "--font-outfit",
 });
 
 export const metadata = {
     title: {
-        template: "%s - MD Pahlovi",
-        default: "MD Pahlovi - Portfolio",
+        template: "%s - WeStud",
+        default: "WeStud - Study Effectively",
     },
-    description: "This is MD Pahlovi. I am a Web Developer",
+    description: "WeStud is a platform for students to study effectively",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className={`${plusJakartaSans.variable} ${outfit.variable}`}>
+        <html lang="en" className={poppins.className}>
             <body>{children}</body>
         </html>
     );
