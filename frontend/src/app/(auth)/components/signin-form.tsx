@@ -4,8 +4,10 @@ import { actions } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useFormik } from "formik";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as Yup from "yup";
 
@@ -15,6 +17,9 @@ const signinSchema = Yup.object({
 });
 
 export default function SigninForm({ className, ...props }: React.ComponentProps<"form">) {
+    const { setUser } = useAuthStore();
+    const router = useRouter();
+
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -25,6 +30,8 @@ export default function SigninForm({ className, ...props }: React.ComponentProps
             await actions.auth.signinUserAction(value).then((res) => {
                 if (res?.success) {
                     toast.success(res.message);
+                    setUser(res.data);
+                    router.replace("/dashboard");
                 } else {
                     toast.error(res.message);
                 }

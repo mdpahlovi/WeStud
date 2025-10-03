@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import MenuButton from "./Menu";
 
 export default function Navbar() {
     return (
@@ -12,14 +12,7 @@ export default function Navbar() {
                         <h1 className="text-2xl font-bold">WeStud</h1>
                     </Link>
 
-                    <div className="flex md:items-center md:space-x-4">
-                        <Button variant="ghost" asChild>
-                            <Link href="/signin">Sign In</Link>
-                        </Button>
-                        <Button asChild>
-                            <Link href="/signup">Get Started</Link>
-                        </Button>
-                    </div>
+                    <MenuButton />
                 </div>
             </div>
         </nav>

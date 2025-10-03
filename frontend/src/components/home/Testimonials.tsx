@@ -8,21 +8,21 @@ const testimonials = [
         role: "Web Developer",
         content: "WeStud transformed my career. The role-based learning path was exactly what I needed.",
         rating: 5,
-        avatar: "/api/placeholder/40/40",
+        avatar: undefined,
     },
     {
         name: "Mike Chen",
         role: "Student",
         content: "The recorded classes feature is amazing. I can learn at my own pace and revisit topics anytime.",
         rating: 5,
-        avatar: "/api/placeholder/40/40",
+        avatar: undefined,
     },
     {
         name: "Emily Davis",
         role: "Social Media Manager",
         content: "Industry-relevant content and expert instructors. Best investment in my professional growth!",
         rating: 5,
-        avatar: "/api/placeholder/40/40",
+        avatar: undefined,
     },
 ];
 
@@ -40,7 +40,7 @@ export default function Testimonials() {
                         <Card key={index} className="border-none shadow-sm">
                             <CardHeader>
                                 <div className="flex items-center gap-4">
-                                    <Avatar>
+                                    <Avatar className="w-10 h-10">
                                         <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
                                         <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
                                     </Avatar>

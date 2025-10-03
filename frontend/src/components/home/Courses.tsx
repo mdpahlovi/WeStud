@@ -69,7 +69,7 @@ export default function CoursesPreview() {
                                 <p className="text-sm text-muted-foreground line-clamp-2">{course.description}</p>
                             </CardHeader>
                             <CardContent>
-                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div className="flex justify-between items-center gap-4 text-sm text-muted-foreground">
                                     <span className="flex items-center gap-1">
                                         <Clock className="h-4 w-4" />
                                         {course.duration}

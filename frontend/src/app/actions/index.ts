@@ -1,8 +1,10 @@
-import { signinUserAction, signupUserAction } from "./auth";
+import { getUser, signinUserAction, signoutUserAction, signupUserAction } from "./auth";
 
 export const actions = {
     auth: {
         signupUserAction,
         signinUserAction,
+        signoutUserAction,
+        getUser,
     },
 };

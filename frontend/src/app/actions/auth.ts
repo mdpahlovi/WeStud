@@ -1,8 +1,6 @@
 "use server";
 
-import console from "console";
 import { cookies } from "next/headers";
-import { redirect, RedirectType } from "next/navigation";
 
 type SignupUserActionProps = {
     firstName: string;
@@ -16,19 +14,6 @@ type SigninUserActionProps = {
     password: string;
 };
 
-export type User = {
-    id: number;
-    documentId: string;
-    username: string;
-    email: string;
-    provider: string;
-    confirmed: boolean;
-    blocked: boolean;
-    createdAt: string;
-    updatedAt: string;
-    publishedAt: string;
-};
-
 const config = {
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
@@ -37,10 +22,10 @@ const config = {
     secure: process.env.NODE_ENV === "production",
 };
 
-const baseUrl = process.env.SERVER_URL;
+const baseUrl = `${process.env.SERVER_URL}/api/auth`;
 
 export async function signupUserAction({ firstName, lastName, email, password }: SignupUserActionProps) {
-    const response = await fetch(`${baseUrl}/api/auth/local/register`, {
+    const response = await fetch(`${baseUrl}/local/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -59,12 +44,12 @@ export async function signupUserAction({ firstName, lastName, email, password }:
     } else {
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, config);
-        redirect("/dashboard", RedirectType.replace);
+        return { success: true, message: "User signed up successfully", data: data?.user };
     }
 }
 
 export async function signinUserAction({ email, password }: SigninUserActionProps) {
-    const response = await fetch(`${baseUrl}/api/auth/local`, {
+    const response = await fetch(`${baseUrl}/local`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -82,14 +67,13 @@ export async function signinUserAction({ email, password }: SigninUserActionProp
     } else {
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, config);
-        redirect("/dashboard", RedirectType.replace);
+        return { success: true, message: "User signed in successfully", data: data?.user };
     }
 }
 
 export async function signoutUserAction() {
     const cookieStore = await cookies();
     cookieStore.delete("token");
-    redirect("/", RedirectType.replace);
 }
 
 export async function getUser() {
@@ -97,10 +81,10 @@ export async function getUser() {
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
-        redirect("/signin", RedirectType.replace);
+        return null;
     }
 
-    const response = await fetch(`${baseUrl}/api/auth/me`, {
+    const response = await fetch(`${baseUrl}/me`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -109,9 +93,9 @@ export async function getUser() {
     const data = await response.json();
 
     if (!response.ok) {
-        redirect("/signin", RedirectType.replace);
+        cookieStore.delete("token");
+        return null;
     } else {
-        console.log(data);
         return data;
     }
 }

@@ -6,7 +6,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as Yup from "yup";
 
@@ -18,6 +20,9 @@ const signupSchema = Yup.object({
 });
 
 export default function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
+    const { setUser } = useAuthStore();
+    const router = useRouter();
+
     const formik = useFormik({
         initialValues: {
             firstName: "",
@@ -30,6 +35,8 @@ export default function SignupForm({ className, ...props }: React.ComponentProps
             await actions.auth.signupUserAction(value).then((res) => {
                 if (res?.success) {
                     toast.success(res.message);
+                    setUser(res.data);
+                    router.replace("/dashboard");
                 } else {
                     toast.error(res.message);
                 }
