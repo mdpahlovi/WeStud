@@ -10,6 +10,7 @@ function Input({ type = "text", label, className, error, ...props }: InputProps)
     return (
         <div className="relative">
             <input
+                id={props.name}
                 type={type}
                 className={cn(
                     "peer w-full px-0 pt-3.75 pb-1 border-0 border-b-2 border-input focus:border-primary focus:outline-none",
@@ -17,7 +18,10 @@ function Input({ type = "text", label, className, error, ...props }: InputProps)
                 )}
                 {...props}
             />
-            <label htmlFor={props.name} className="absolute left-0 top-3.75 peer-focus:-top-1 peer-placeholder-shown:-top-1 transition-all">
+            <label
+                htmlFor={props.name}
+                className={cn("absolute left-0 top-3.75 transition-all", props.value ? "-top-1" : "peer-focus:-top-1")}
+            >
                 {label}
             </label>
             {error && <p className="mt-0.5 text-xs leading-4 text-destructive">{error}</p>}

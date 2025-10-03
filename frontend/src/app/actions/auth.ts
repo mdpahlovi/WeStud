@@ -1,5 +1,6 @@
 "use server";
 
+import console from "console";
 import { cookies } from "next/headers";
 import { redirect, RedirectType } from "next/navigation";
 
@@ -36,10 +37,10 @@ const config = {
     secure: process.env.NODE_ENV === "production",
 };
 
-export async function signupUserAction({ firstName, lastName, email, password }: SignupUserActionProps) {
-    const url = new URL("/api/auth/local/register", process.env.SERVER_URL);
+const baseUrl = process.env.SERVER_URL;
 
-    const response = await fetch(url, {
+export async function signupUserAction({ firstName, lastName, email, password }: SignupUserActionProps) {
+    const response = await fetch(`${baseUrl}/api/auth/local/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -63,9 +64,7 @@ export async function signupUserAction({ firstName, lastName, email, password }:
 }
 
 export async function signinUserAction({ email, password }: SigninUserActionProps) {
-    const url = new URL("/api/auth/local", process.env.SERVER_URL);
-
-    const response = await fetch(url, {
+    const response = await fetch(`${baseUrl}/api/auth/local`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -84,5 +83,35 @@ export async function signinUserAction({ email, password }: SigninUserActionProp
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, config);
         redirect("/dashboard", RedirectType.replace);
+    }
+}
+
+export async function signoutUserAction() {
+    const cookieStore = await cookies();
+    cookieStore.delete("token");
+    redirect("/", RedirectType.replace);
+}
+
+export async function getUser() {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token) {
+        redirect("/signin", RedirectType.replace);
+    }
+
+    const response = await fetch(`${baseUrl}/api/auth/me`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        redirect("/signin", RedirectType.replace);
+    } else {
+        console.log(data);
+        return data;
     }
 }
