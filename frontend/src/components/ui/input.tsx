@@ -20,7 +20,7 @@ function Input({ type = "text", label, className, error, ...props }: InputProps)
             <label htmlFor={props.name} className="absolute left-0 top-3.75 peer-focus:-top-1 peer-placeholder-shown:-top-1 transition-all">
                 {label}
             </label>
-            {error && <p className="mt-0.5 leading-4 text-destructive">{error}</p>}
+            {error && <p className="mt-0.5 text-xs leading-4 text-destructive">{error}</p>}
         </div>
     );
 }

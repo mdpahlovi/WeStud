@@ -1,11 +1,12 @@
 "use client";
 
+import { actions } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useFormik } from "formik";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import * as Yup from "yup";
 
 const signinSchema = Yup.object({
@@ -14,20 +15,25 @@ const signinSchema = Yup.object({
 });
 
 export default function SigninForm({ className, ...props }: React.ComponentProps<"form">) {
-    const router = useRouter();
-
     const formik = useFormik({
         initialValues: {
             email: "",
             password: "",
         },
         validationSchema: signinSchema,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onSubmit: async (value) => {},
+        onSubmit: async (value) => {
+            await actions.auth.signinUserAction(value).then((res) => {
+                if (res?.success) {
+                    toast.success(res.message);
+                } else {
+                    toast.error(res.message);
+                }
+            });
+        },
     });
 
     return (
-        <form className={cn("flex flex-col gap-6", className)} {...props}>
+        <form className={cn("flex flex-col gap-6", className)} onSubmit={formik.handleSubmit} {...props}>
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground text-balance">Please enter your details to sign in</p>

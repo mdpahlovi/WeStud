@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import { Toaster } from "@/components/ui/sonner";
 import { Poppins } from "next/font/google";
 
 export const poppins = Poppins({
@@ -18,7 +19,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en" className={poppins.className}>
-            <body>{children}</body>
+            <body>
+                {children}
+                <Toaster position="top-right" />
+            </body>
         </html>
     );
 }

@@ -1,10 +1,13 @@
+"use client";
+
+import { actions } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useFormik } from "formik";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import * as Yup from "yup";
 
 const signupSchema = Yup.object({
@@ -12,15 +15,9 @@ const signupSchema = Yup.object({
     lastName: Yup.string().max(20, "Must be 20 characters or less").required("Last name is required"),
     email: Yup.string().email("Invalid email address").required("Email is required"),
     password: Yup.string().required("Password is required"),
-    confirmPassword: Yup.string()
-        .required("Confirm password is required")
-        .oneOf([Yup.ref("password")], "Passwords must match"),
-    agreeTerms: Yup.boolean().required("Agree to terms is required"),
 });
 
 export default function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
-    const router = useRouter();
-
     const formik = useFormik({
         initialValues: {
             firstName: "",
@@ -29,12 +26,19 @@ export default function SignupForm({ className, ...props }: React.ComponentProps
             password: "",
         },
         validationSchema: signupSchema,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onSubmit: async (value) => {},
+        onSubmit: async (value) => {
+            await actions.auth.signupUserAction(value).then((res) => {
+                if (res?.success) {
+                    toast.success(res.message);
+                } else {
+                    toast.error(res.message);
+                }
+            });
+        },
     });
 
     return (
-        <form className={cn("flex flex-col gap-6", className)} {...props}>
+        <form className={cn("flex flex-col gap-6", className)} onSubmit={formik.handleSubmit} {...props}>
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Create an account</h1>
                 <p className="text-muted-foreground text-balance">Please enter your details to get started</p>
