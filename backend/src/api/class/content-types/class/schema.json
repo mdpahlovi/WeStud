@@ -1,10 +1,10 @@
 {
     "kind": "singleType",
-    "collectionName": "modules",
+    "collectionName": "classes",
     "info": {
-        "singularName": "module",
-        "pluralName": "modules",
-        "displayName": "Module"
+        "singularName": "class",
+        "pluralName": "classes",
+        "displayName": "Class"
     },
     "options": {
         "draftAndPublish": true
@@ -18,20 +18,24 @@
         "description": {
             "type": "text"
         },
+        "video": {
+            "type": "media",
+            "multiple": false,
+            "required": true,
+            "allowedTypes": ["videos"]
+        },
+        "duration": {
+            "type": "integer",
+            "required": true
+        },
         "order": {
             "type": "integer",
             "required": true
         },
-        "course": {
+        "module": {
             "type": "relation",
             "relation": "manyToOne",
-            "target": "api::course.course"
-        },
-        "classes": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::class.class",
-            "mappedBy": "module"
+            "target": "api::module.module"
         }
     }
 }

@@ -1,38 +1,45 @@
 {
-  "kind": "singleType",
-  "collectionName": "enrollments",
-  "info": {
-    "singularName": "enrollment",
-    "pluralName": "enrollments",
-    "displayName": "Enrollment"
-  },
-  "options": {
-    "draftAndPublish": true
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "price": {
-      "type": "decimal",
-      "required": true
+    "kind": "singleType",
+    "collectionName": "enrollments",
+    "info": {
+        "singularName": "enrollment",
+        "pluralName": "enrollments",
+        "displayName": "Enrollment"
     },
-    "enrolled_date": {
-      "type": "datetime",
-      "required": true
+    "options": {
+        "draftAndPublish": true
     },
-    "progress": {
-      "type": "integer",
-      "required": true,
-      "default": 0
-    },
-    "statuss": {
-      "type": "enumeration",
-      "required": true,
-      "default": "pending",
-      "enum": [
-        "pending",
-        "running",
-        "completed"
-      ]
+    "pluginOptions": {},
+    "attributes": {
+        "user": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "plugin::users-permissions.user"
+        },
+        "course": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::course.course"
+        },
+        "price": {
+            "type": "decimal",
+            "required": true
+        },
+        "enrolled_date": {
+            "type": "datetime",
+            "required": true
+        },
+        "progress": {
+            "type": "integer",
+            "required": true,
+            "min": 0,
+            "max": 100
+        },
+        "statuss": {
+            "type": "enumeration",
+            "required": true,
+            "default": "pending",
+            "enum": ["pending", "running", "completed"]
+        }
     }
-  }
 }
