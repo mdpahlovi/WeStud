@@ -31,7 +31,9 @@ export async function signupUserAction({ firstName, lastName, email, password }:
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            username: `${firstName} ${lastName}`,
+            firstName,
+            lastName,
+            username: email.split("@")[0],
             email,
             password,
         }),

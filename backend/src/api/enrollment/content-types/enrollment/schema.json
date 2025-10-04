@@ -1,0 +1,38 @@
+{
+  "kind": "singleType",
+  "collectionName": "enrollments",
+  "info": {
+    "singularName": "enrollment",
+    "pluralName": "enrollments",
+    "displayName": "Enrollment"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "price": {
+      "type": "decimal",
+      "required": true
+    },
+    "enrolled_date": {
+      "type": "datetime",
+      "required": true
+    },
+    "progress": {
+      "type": "integer",
+      "required": true,
+      "default": 0
+    },
+    "statuss": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pending",
+      "enum": [
+        "pending",
+        "running",
+        "completed"
+      ]
+    }
+  }
+}
