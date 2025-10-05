@@ -1,47 +1,51 @@
 {
-    "kind": "collectionType",
-    "collectionName": "enrollments",
-    "info": {
-        "singularName": "enrollment",
-        "pluralName": "enrollments",
-        "displayName": "Enrollment"
+  "kind": "collectionType",
+  "collectionName": "enrollments",
+  "info": {
+    "singularName": "enrollment",
+    "pluralName": "enrollments",
+    "displayName": "Enrollment"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "enrollments"
     },
-    "options": {
-        "draftAndPublish": true
+    "course": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "enrollments"
     },
-    "pluginOptions": {},
-    "attributes": {
-        "user": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "plugin::users-permissions.user",
-            "inversedBy": "enrollments"
-        },
-        "course": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::course.course",
-            "inversedBy": "enrollments"
-        },
-        "price": {
-            "type": "decimal",
-            "required": true
-        },
-        "enrolled_date": {
-            "type": "datetime",
-            "required": true
-        },
-        "progress": {
-            "type": "integer",
-            "required": true,
-            "min": 0,
-            "max": 100
-        },
-        "statuss": {
-            "type": "enumeration",
-            "required": true,
-            "default": "pending",
-            "enum": ["pending", "running", "completed"]
-        }
+    "price": {
+      "type": "decimal",
+      "required": true
+    },
+    "enrolled_date": {
+      "type": "datetime",
+      "required": true
+    },
+    "progress": {
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "max": 100
+    },
+    "statuss": {
+      "type": "enumeration",
+      "required": true,
+      "default": "pending",
+      "enum": [
+        "pending",
+        "running",
+        "completed"
+      ]
     }
+  }
 }

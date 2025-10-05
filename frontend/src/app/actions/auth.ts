@@ -22,18 +22,16 @@ const config = {
     secure: process.env.NODE_ENV === "production",
 };
 
-const baseUrl = `${process.env.SERVER_URL}/api/auth`;
+const baseUrl = `${process.env.SERVER_URL}/api`;
 
 export async function signupUserAction({ firstName, lastName, email, password }: SignupUserActionProps) {
-    const response = await fetch(`${baseUrl}/local/register`, {
+    const response = await fetch(`${baseUrl}/auth/local/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            firstName,
-            lastName,
-            username: email.split("@")[0],
+            username: `${firstName} ${lastName}`,
             email,
             password,
         }),
@@ -51,7 +49,7 @@ export async function signupUserAction({ firstName, lastName, email, password }:
 }
 
 export async function signinUserAction({ email, password }: SigninUserActionProps) {
-    const response = await fetch(`${baseUrl}/local`, {
+    const response = await fetch(`${baseUrl}/auth/local`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -86,7 +84,7 @@ export async function getUser() {
         return null;
     }
 
-    const response = await fetch(`${baseUrl}/me`, {
+    const response = await fetch(`${baseUrl}/users/me`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

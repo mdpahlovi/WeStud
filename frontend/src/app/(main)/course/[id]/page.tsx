@@ -1,18 +1,20 @@
 import { actions } from "@/app/actions";
+import EnrollButton from "@/components/course/EnrollButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, Clock, Play } from "lucide-react";
+import markdown from "markdown-it";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     const { data } = await actions.course.getOneCourseAction(id);
 
     if (!data) {
-        return <div>Course not found</div>;
+        return notFound();
     }
 
     const totalClasses = data.modules.reduce((acc, module) => acc + module.classes.length, 0);
@@ -55,7 +57,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                     <div className="lg:col-span-2 space-y-6">
                         <Card>
                             <CardContent>
-                                <div dangerouslySetInnerHTML={{ __html: data.description }}></div>
+                                <div
+                                    className="markdown-content"
+                                    dangerouslySetInnerHTML={{ __html: markdown().render(data.description) }}
+                                ></div>
                             </CardContent>
                         </Card>
 
@@ -135,9 +140,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
                                 <CardDescription>One-time payment</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <Button className="w-full h-12 text-base font-bold" size="lg">
-                                    Enroll Now
-                                </Button>
+                                <EnrollButton course={data} />
 
                                 <Separator />
 

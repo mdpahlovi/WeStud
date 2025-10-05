@@ -1048,8 +1048,6 @@ export interface PluginUsersPermissionsUser
       'oneToMany',
       'api::enrollment.enrollment'
     >;
-    firstName: Schema.Attribute.String & Schema.Attribute.Required;
-    lastName: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

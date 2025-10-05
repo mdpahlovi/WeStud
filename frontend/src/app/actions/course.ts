@@ -1,10 +1,11 @@
 "use server";
 
+import type { User } from "@/stores/useAuthStore";
 import qs from "qs";
 
-const baseUrl = `${process.env.SERVER_URL}/api/courses`;
+const baseUrl = `${process.env.SERVER_URL}/api`;
 
-type Course = {
+export type Course = {
     id: number;
     documentId: string;
     title: string;
@@ -35,11 +36,16 @@ type Course = {
     }[];
 };
 
-type Response<T> = {
-    success: boolean;
-    message: string;
-    data: T;
-};
+export type Response<T = undefined> = T extends undefined
+    ? {
+          success: boolean;
+          message: string;
+      }
+    : {
+          success: boolean;
+          message: string;
+          data: T;
+      };
 
 export async function getAllCourseAction(): Promise<Response<Course[]>> {
     const queryParams = qs.stringify(
@@ -61,7 +67,7 @@ export async function getAllCourseAction(): Promise<Response<Course[]>> {
         { encodeValuesOnly: true }
     );
 
-    const response = await fetch(`${baseUrl}?${queryParams}`, {
+    const response = await fetch(`${baseUrl}/courses?${queryParams}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -104,7 +110,7 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
         { encodeValuesOnly: true }
     );
 
-    const response = await fetch(`${baseUrl}/${id}?${queryParams}`, {
+    const response = await fetch(`${baseUrl}/courses/${id}?${queryParams}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -113,11 +119,47 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
     });
 
     if (!response.ok) {
-        console.log(response);
         return { success: false, message: "Failed to fetch course", data: null };
     }
 
     const data = await response.json();
 
     return { success: true, message: "Course fetched successfully", data: data.data };
+}
+
+export async function enrollCourseAction({ course, user }: { course: Course; user: User }): Promise<Response> {
+    if (!course?.id) {
+        return { success: false, message: "Course ID is required" };
+    }
+
+    if (!user?.id) {
+        return { success: false, message: "User authentication required" };
+    }
+
+    const enrollmentData = {
+        data: {
+            user: user.id,
+            course: course.id,
+            price: course.price,
+            enrolled_date: new Date().toISOString(),
+            progress: 0,
+            status: "running",
+        },
+    };
+
+    const response = await fetch(`${baseUrl}/enrollments`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(enrollmentData),
+    });
+
+    console.log({ response });
+
+    if (!response.ok) {
+        return { success: false, message: "Failed to enroll in course" };
+    }
+
+    return { success: true, message: "Successfully enrolled in course" };
 }
