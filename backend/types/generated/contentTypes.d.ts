@@ -430,7 +430,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiClassClass extends Struct.SingleTypeSchema {
+export interface ApiClassClass extends Struct.CollectionTypeSchema {
   collectionName: 'classes';
   info: {
     displayName: 'Class';
@@ -460,7 +460,7 @@ export interface ApiClassClass extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiCourseCourse extends Struct.SingleTypeSchema {
+export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
   collectionName: 'courses';
   info: {
     displayName: 'Course';
@@ -498,7 +498,7 @@ export interface ApiCourseCourse extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiEnrollmentEnrollment extends Struct.SingleTypeSchema {
+export interface ApiEnrollmentEnrollment extends Struct.CollectionTypeSchema {
   collectionName: 'enrollments';
   info: {
     displayName: 'Enrollment';
@@ -544,7 +544,7 @@ export interface ApiEnrollmentEnrollment extends Struct.SingleTypeSchema {
   };
 }
 
-export interface ApiModuleModule extends Struct.SingleTypeSchema {
+export interface ApiModuleModule extends Struct.CollectionTypeSchema {
   collectionName: 'modules';
   info: {
     displayName: 'Module';
