@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import qs from "qs";
 
 type SignupUserActionProps = {
     firstName: string;
@@ -44,7 +45,10 @@ export async function signupUserAction({ firstName, lastName, email, password }:
     } else {
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, config);
-        return { success: true, message: "User signed up successfully", data: data?.user };
+
+        const user = await getUserWithRole(data.jwt);
+
+        return { success: true, message: "User signed up successfully", data: user };
     }
 }
 
@@ -67,7 +71,10 @@ export async function signinUserAction({ email, password }: SigninUserActionProp
     } else {
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, config);
-        return { success: true, message: "User signed in successfully", data: data?.user };
+
+        const user = await getUserWithRole(data.jwt);
+
+        return { success: true, message: "User signed in successfully", data: user };
     }
 }
 
@@ -84,7 +91,22 @@ export async function getUser() {
         return null;
     }
 
-    const response = await fetch(`${baseUrl}/users/me`, {
+    return await getUserWithRole(token);
+}
+
+async function getUserWithRole(token: string) {
+    const queryParams = qs.stringify(
+        {
+            populate: {
+                role: {
+                    fields: ["name", "description"],
+                },
+            },
+        },
+        { encodeValuesOnly: true }
+    );
+
+    const response = await fetch(`${baseUrl}/users/me?${queryParams}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -93,6 +115,7 @@ export async function getUser() {
     const data = await response.json();
 
     if (!response.ok) {
+        const cookieStore = await cookies();
         cookieStore.delete("token");
         return null;
     } else {

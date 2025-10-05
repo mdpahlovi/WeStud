@@ -1,6 +1,7 @@
 "use server";
 
 import type { User } from "@/stores/useAuthStore";
+import { cookies } from "next/headers";
 import qs from "qs";
 
 const baseUrl = `${process.env.SERVER_URL}/api`;
@@ -127,19 +128,22 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
     return { success: true, message: "Course fetched successfully", data: data.data };
 }
 
-export async function enrollCourseAction({ course, user }: { course: Course; user: User }): Promise<Response> {
-    if (!course?.id) {
-        return { success: false, message: "Course ID is required" };
-    }
+export async function enrollCourseAction({ user, course }: { user: User; course: Course }): Promise<Response> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
     if (!user?.id) {
-        return { success: false, message: "User authentication required" };
+        return { success: false, message: "User is required" };
+    }
+
+    if (!course?.id) {
+        return { success: false, message: "Course is required" };
     }
 
     const enrollmentData = {
         data: {
-            user: user.id,
-            course: course.id,
+            user: user.documentId,
+            course: course.documentId,
             price: course.price,
             enrolled_date: new Date().toISOString(),
             progress: 0,
@@ -151,11 +155,10 @@ export async function enrollCourseAction({ course, user }: { course: Course; use
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(enrollmentData),
     });
-
-    console.log({ response });
 
     if (!response.ok) {
         return { success: false, message: "Failed to enroll in course" };

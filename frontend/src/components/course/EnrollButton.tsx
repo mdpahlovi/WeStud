@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 export default function EnrollButton({ course }: { course: Course }) {
     const router = useRouter();
@@ -22,7 +23,13 @@ export default function EnrollButton({ course }: { course: Course }) {
                     router.push("/signin");
                 } else {
                     startTransition(async () => {
-                        await actions.course.enrollCourseAction({ course: course, user: user });
+                        await actions.course.enrollCourseAction({ course: course, user: user }).then((res) => {
+                            if (res?.success) {
+                                toast.success(res.message);
+                            } else {
+                                toast.error(res.message);
+                            }
+                        });
                     });
                 }
             }}

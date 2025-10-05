@@ -11,6 +11,12 @@ export type User = {
     createdAt: string;
     updatedAt: string;
     publishedAt: string;
+    role: {
+        id: number;
+        documentId: string;
+        name: string;
+        description: string;
+    };
 };
 
 type AuthStore = {
