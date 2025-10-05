@@ -2,7 +2,7 @@ import { actions } from "@/app/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock } from "lucide-react";
+import { Clock, Library } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -45,16 +45,16 @@ export default async function CoursesPreview() {
                                         <Clock className="h-4 w-4" />
                                         {course.duration}
                                     </span>
-                                    <span className="flex items-center gap-1">
-                                        {/* <Users className="h-4 w-4" />
-                                        {course.students} */}
+                                    <span className="flex items-center gap-0.5">
+                                        <Library className="h-4 w-4" />
+                                        {`${course.modules.length}`.padStart(2, "0")}
                                     </span>
                                 </div>
                             </CardContent>
                             <CardFooter className="flex justify-between items-center">
                                 <span className="text-2xl font-bold">{Math.round(course.price)}৳</span>
                                 <Button asChild>
-                                    <Link href={`/courses/${course.id}`}>Enroll Now</Link>
+                                    <Link href={`/course/${course.documentId}`}>View Details</Link>
                                 </Button>
                             </CardFooter>
                         </Card>

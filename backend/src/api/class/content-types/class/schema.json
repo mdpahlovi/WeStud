@@ -35,7 +35,8 @@
         "module": {
             "type": "relation",
             "relation": "manyToOne",
-            "target": "api::module.module"
+            "target": "api::module.module",
+            "inversedBy": "classes"
         }
     }
 }

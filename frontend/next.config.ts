@@ -6,9 +6,9 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
             {
-                protocol: "https",
-                hostname: "refreshing-renewal-6f66a388b1.strapiapp.com",
-                port: "",
+                protocol: "http",
+                hostname: "localhost",
+                port: "1337",
                 pathname: "/uploads/**",
             },
         ],

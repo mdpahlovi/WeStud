@@ -1,38 +1,67 @@
 "use server";
 
+import qs from "qs";
+
 const baseUrl = `${process.env.SERVER_URL}/api/courses`;
 
-type CoursesResponse = {
-    success: boolean;
-    message: string;
-    data: {
-        id: number;
+type Course = {
+    id: number;
+    documentId: string;
+    title: string;
+    description: string;
+    duration: string;
+    price: number;
+    badge: string;
+    createdAt: string;
+    updatedAt: string;
+    publishedAt: string;
+    image: {
+        id: string;
+        documentId: string;
+        url: string;
+    };
+    modules: {
+        id: string;
         documentId: string;
         title: string;
         description: string;
-        duration: string;
-        price: number;
-        badge: string;
-        createdAt: string;
-        updatedAt: string;
-        publishedAt: string;
-        image: {
+        classes: {
             id: string;
             documentId: string;
-            url: string;
-        };
+            title: string;
+            description: string;
+            duration: number;
+        }[];
     }[];
 };
 
-export async function getAllCourseAction(): Promise<CoursesResponse> {
-    const queryParams = new URLSearchParams();
+type Response<T> = {
+    success: boolean;
+    message: string;
+    data: T;
+};
 
-    queryParams.append("populate[image][fields][0]", "url");
+export async function getAllCourseAction(): Promise<Response<Course[]>> {
+    const queryParams = qs.stringify(
+        {
+            populate: {
+                image: {
+                    fields: ["url"],
+                },
+                modules: {
+                    sort: ["order:asc"],
+                    fields: ["title", "description"],
+                },
+            },
+            pagination: {
+                page: 1,
+                pageSize: 12,
+            },
+        },
+        { encodeValuesOnly: true }
+    );
 
-    queryParams.append("pagination[page]", "1");
-    queryParams.append("pagination[pageSize]", "12");
-
-    const response = await fetch(`${baseUrl}?${queryParams.toString()}`, {
+    const response = await fetch(`${baseUrl}?${queryParams}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -49,23 +78,33 @@ export async function getAllCourseAction(): Promise<CoursesResponse> {
     return { success: true, message: "Courses fetched successfully", data: data.data };
 }
 
-export async function getOneCourseAction(id: string) {
+export async function getOneCourseAction(id: string): Promise<Response<Course | null>> {
     if (!id) {
-        return { success: false, message: "Course ID is required" };
+        return { success: false, message: "Course ID is required", data: null };
     }
 
-    const queryParams = new URLSearchParams();
+    const queryParams = qs.stringify(
+        {
+            populate: {
+                image: {
+                    fields: ["url"],
+                },
+                modules: {
+                    sort: ["order:asc"],
+                    fields: ["title", "description"],
+                    populate: {
+                        classes: {
+                            sort: ["order:asc"],
+                            fields: ["title", "description", "duration"],
+                        },
+                    },
+                },
+            },
+        },
+        { encodeValuesOnly: true }
+    );
 
-    queryParams.append("populate[image][fields][0]", "url");
-
-    queryParams.append("populate[modules][populate][classes][fields][0]", "title");
-    queryParams.append("populate[modules][populate][classes][fields][1]", "description");
-    queryParams.append("populate[modules][populate][classes][fields][2]", "duration");
-    queryParams.append("populate[modules][populate][classes][fields][3]", "order");
-
-    queryParams.append("populate[modules][sort][0]", "order:asc");
-
-    const response = await fetch(`${baseUrl}/${id}?${queryParams.toString()}`, {
+    const response = await fetch(`${baseUrl}/${id}?${queryParams}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -74,7 +113,8 @@ export async function getOneCourseAction(id: string) {
     });
 
     if (!response.ok) {
-        return { success: false, message: "Failed to fetch course" };
+        console.log(response);
+        return { success: false, message: "Failed to fetch course", data: null };
     }
 
     const data = await response.json();
