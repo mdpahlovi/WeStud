@@ -438,7 +438,7 @@ export interface ApiClassClass extends Struct.CollectionTypeSchema {
     singularName: 'class';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -468,7 +468,7 @@ export interface ApiCourseCourse extends Struct.CollectionTypeSchema {
     singularName: 'course';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     badge: Schema.Attribute.String;
@@ -506,7 +506,7 @@ export interface ApiEnrollmentEnrollment extends Struct.CollectionTypeSchema {
     singularName: 'enrollment';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     course: Schema.Attribute.Relation<'manyToOne', 'api::course.course'>;
@@ -552,7 +552,7 @@ export interface ApiModuleModule extends Struct.CollectionTypeSchema {
     singularName: 'module';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     classes: Schema.Attribute.Relation<'oneToMany', 'api::class.class'>;

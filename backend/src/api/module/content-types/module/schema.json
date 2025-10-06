@@ -1,38 +1,38 @@
 {
-    "kind": "collectionType",
-    "collectionName": "modules",
-    "info": {
-        "singularName": "module",
-        "pluralName": "modules",
-        "displayName": "Module"
+  "kind": "collectionType",
+  "collectionName": "modules",
+  "info": {
+    "singularName": "module",
+    "pluralName": "modules",
+    "displayName": "Module"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
     },
-    "options": {
-        "draftAndPublish": true
+    "description": {
+      "type": "text"
     },
-    "pluginOptions": {},
-    "attributes": {
-        "title": {
-            "type": "string",
-            "required": true
-        },
-        "description": {
-            "type": "text"
-        },
-        "order": {
-            "type": "integer",
-            "required": true
-        },
-        "course": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::course.course",
-            "inversedBy": "modules"
-        },
-        "classes": {
-            "type": "relation",
-            "relation": "oneToMany",
-            "target": "api::class.class",
-            "mappedBy": "module"
-        }
+    "order": {
+      "type": "integer",
+      "required": true
+    },
+    "course": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::course.course",
+      "inversedBy": "modules"
+    },
+    "classes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::class.class",
+      "mappedBy": "module"
     }
+  }
 }

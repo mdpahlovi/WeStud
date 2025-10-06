@@ -76,20 +76,16 @@ export async function getAllCourseAction(): Promise<Response<Course[]>> {
         cache: "no-store",
     });
 
-    if (!response.ok) {
-        return { success: false, message: "Failed to fetch courses", data: [] };
-    }
-
     const data = await response.json();
 
-    return { success: true, message: "Courses fetched successfully", data: data.data };
+    if (!response.ok) {
+        return { success: false, message: data?.error?.message || "Something went wrong", data: [] };
+    } else {
+        return { success: true, message: "Courses fetched successfully", data: data.data };
+    }
 }
 
 export async function getOneCourseAction(id: string): Promise<Response<Course | null>> {
-    if (!id) {
-        return { success: false, message: "Course ID is required", data: null };
-    }
-
     const queryParams = qs.stringify(
         {
             populate: {
@@ -119,35 +115,27 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
         cache: "no-store",
     });
 
-    if (!response.ok) {
-        return { success: false, message: "Failed to fetch course", data: null };
-    }
-
     const data = await response.json();
 
-    return { success: true, message: "Course fetched successfully", data: data.data };
+    if (!response.ok) {
+        return { success: false, message: data?.error?.message || "Something went wrong", data: null };
+    } else {
+        return { success: true, message: "Course fetched successfully", data: data.data };
+    }
 }
 
 export async function enrollCourseAction({ user, course }: { user: User; course: Course }): Promise<Response> {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
-    if (!user?.id) {
-        return { success: false, message: "User is required" };
-    }
-
-    if (!course?.id) {
-        return { success: false, message: "Course is required" };
-    }
-
     const enrollmentData = {
         data: {
-            user: user.documentId,
-            course: course.documentId,
+            user: user.id,
+            course: course.id,
             price: course.price,
             enrolled_date: new Date().toISOString(),
             progress: 0,
-            status: "running",
+            statuss: "running",
         },
     };
 
@@ -160,9 +148,11 @@ export async function enrollCourseAction({ user, course }: { user: User; course:
         body: JSON.stringify(enrollmentData),
     });
 
-    if (!response.ok) {
-        return { success: false, message: "Failed to enroll in course" };
-    }
+    const data = await response.json();
 
-    return { success: true, message: "Successfully enrolled in course" };
+    if (!response.ok) {
+        return { success: false, message: data?.error?.message || "Something went wrong" };
+    } else {
+        return { success: true, message: "Successfully enrolled in course" };
+    }
 }

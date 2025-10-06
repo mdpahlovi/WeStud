@@ -1,42 +1,44 @@
 {
-    "kind": "collectionType",
-    "collectionName": "classes",
-    "info": {
-        "singularName": "class",
-        "pluralName": "classes",
-        "displayName": "Class"
+  "kind": "collectionType",
+  "collectionName": "classes",
+  "info": {
+    "singularName": "class",
+    "pluralName": "classes",
+    "displayName": "Class"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
     },
-    "options": {
-        "draftAndPublish": true
+    "description": {
+      "type": "text"
     },
-    "pluginOptions": {},
-    "attributes": {
-        "title": {
-            "type": "string",
-            "required": true
-        },
-        "description": {
-            "type": "text"
-        },
-        "video": {
-            "type": "media",
-            "multiple": false,
-            "required": true,
-            "allowedTypes": ["videos"]
-        },
-        "duration": {
-            "type": "integer",
-            "required": true
-        },
-        "order": {
-            "type": "integer",
-            "required": true
-        },
-        "module": {
-            "type": "relation",
-            "relation": "manyToOne",
-            "target": "api::module.module",
-            "inversedBy": "classes"
-        }
+    "video": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "videos"
+      ]
+    },
+    "duration": {
+      "type": "integer",
+      "required": true
+    },
+    "order": {
+      "type": "integer",
+      "required": true
+    },
+    "module": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::module.module",
+      "inversedBy": "classes"
     }
+  }
 }
