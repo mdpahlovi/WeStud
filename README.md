@@ -53,8 +53,6 @@ npm install
 Create `.env` in frontend directory:
 
 ```env
-NODE_ENV='...'
-HOST='...'
 SERVER_URL='...'
 ```
 

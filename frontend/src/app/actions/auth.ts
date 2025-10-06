@@ -15,14 +15,6 @@ type SigninUserActionProps = {
     password: string;
 };
 
-const config = {
-    maxAge: 60 * 60 * 24 * 7,
-    path: "/",
-    domain: process.env.HOST ?? "localhost",
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-};
-
 const baseUrl = `${process.env.SERVER_URL}/api`;
 
 export async function signupUserAction({ firstName, lastName, email, password }: SignupUserActionProps) {
@@ -44,7 +36,7 @@ export async function signupUserAction({ firstName, lastName, email, password }:
         return { success: false, message: data?.error?.message || "Something went wrong" };
     } else {
         const cookieStore = await cookies();
-        cookieStore.set("token", data.jwt, config);
+        cookieStore.set("token", data.jwt);
 
         const user = await getUserWithRole(data.jwt);
 
@@ -70,7 +62,7 @@ export async function signinUserAction({ email, password }: SigninUserActionProp
         return { success: false, message: data?.error?.message || "Something went wrong" };
     } else {
         const cookieStore = await cookies();
-        cookieStore.set("token", data.jwt, config);
+        cookieStore.set("token", data.jwt);
 
         const user = await getUserWithRole(data.jwt);
 
