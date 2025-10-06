@@ -17,6 +17,14 @@ export type User = {
         name: string;
         description: string;
     };
+    enrollments: {
+        id: number;
+        documentId: string;
+        course: {
+            id: number;
+            documentId: string;
+        };
+    }[];
 };
 
 type AuthStore = {

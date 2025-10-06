@@ -33,6 +33,11 @@ export type Course = {
             title: string;
             description: string;
             duration: number;
+            video: {
+                id: string;
+                documentId: string;
+                url: string;
+            };
         }[];
     }[];
 };
@@ -57,7 +62,7 @@ export async function getAllCourseAction(): Promise<Response<Course[]>> {
                 },
                 modules: {
                     sort: ["order:asc"],
-                    fields: ["title", "description"],
+                    fields: ["title"],
                 },
             },
             pagination: {
@@ -99,6 +104,11 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
                         classes: {
                             sort: ["order:asc"],
                             fields: ["title", "description", "duration"],
+                            populate: {
+                                video: {
+                                    fields: ["url"],
+                                },
+                            },
                         },
                     },
                 },
@@ -154,5 +164,50 @@ export async function enrollCourseAction({ user, course }: { user: User; course:
         return { success: false, message: data?.error?.message || "Something went wrong" };
     } else {
         return { success: true, message: "Successfully enrolled in course" };
+    }
+}
+
+export async function getEnrolledCoursesAction(): Promise<Response<Course[]>> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    const queryParams = qs.stringify(
+        {
+            fields: ["id", "documentId"],
+            populate: {
+                enrollments: {
+                    fields: ["id", "documentId"],
+                    populate: {
+                        course: {
+                            populate: {
+                                image: {
+                                    fields: ["url"],
+                                },
+                                modules: {
+                                    sort: ["order:asc"],
+                                    fields: ["title"],
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        { encodeValuesOnly: true }
+    );
+
+    const response = await fetch(`${baseUrl}/users/me?${queryParams}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        return { success: false, message: data?.error?.message || "Something went wrong", data: [] };
+    } else {
+        const courses = data?.enrollments?.map(({ course }: { course: Course }) => course) || [];
+        return { success: true, message: "Enrolled courses fetched successfully", data: courses };
     }
 }

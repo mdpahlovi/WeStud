@@ -102,11 +102,9 @@ async function getUserWithRole(token: string) {
                     fields: ["name", "description"],
                 },
                 enrollments: {
-                    fields: ["enrolled_date"],
+                    fields: ["id", "documentId"],
                     populate: {
-                        course: {
-                            fields: ["title"],
-                        },
+                        course: { fields: ["id", "documentId"] },
                     },
                 },
             },

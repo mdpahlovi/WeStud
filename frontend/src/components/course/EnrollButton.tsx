@@ -13,28 +13,36 @@ export default function EnrollButton({ course }: { course: Course }) {
     const { user } = useAuthStore();
     const [loading, startTransition] = useTransition();
 
-    return (
-        <Button
-            size="lg"
-            className="w-full"
-            loading={loading}
-            onClick={() => {
-                if (!user) {
-                    router.push("/signin");
-                } else {
-                    startTransition(async () => {
-                        await actions.course.enrollCourseAction({ course: course, user: user }).then((res) => {
-                            if (res?.success) {
-                                toast.success(res.message);
-                            } else {
-                                toast.error(res.message);
-                            }
+    if (user?.enrollments.some((e) => e.course.documentId === course.documentId)) {
+        return (
+            <Button size="lg" className="w-full" disabled>
+                Enrolled
+            </Button>
+        );
+    } else {
+        return (
+            <Button
+                size="lg"
+                className="w-full"
+                loading={loading}
+                onClick={() => {
+                    if (!user) {
+                        router.push("/signin");
+                    } else {
+                        startTransition(async () => {
+                            await actions.course.enrollCourseAction({ course: course, user: user }).then((res) => {
+                                if (res?.success) {
+                                    toast.success(res.message);
+                                } else {
+                                    toast.error(res.message);
+                                }
+                            });
                         });
-                    });
-                }
-            }}
-        >
-            Enroll Now
-        </Button>
-    );
+                    }
+                }}
+            >
+                Enroll Now
+            </Button>
+        );
+    }
 }

@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
                 port: "1337",
                 pathname: "/uploads/**",
             },
+            {
+                protocol: "https",
+                hostname: "refreshing-renewal-6f66a388b1.strapiapp.com",
+                port: "",
+                pathname: "/uploads/**",
+            },
         ],
     },
 };
