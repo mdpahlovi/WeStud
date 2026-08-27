@@ -12,11 +12,17 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as Yup from "yup";
 
+const PASSWORD_MIN_LENGTH = 6;
+
 const signupSchema = Yup.object({
     firstName: Yup.string().max(15, "Must be 15 characters or less").required("First name is required"),
     lastName: Yup.string().max(20, "Must be 20 characters or less").required("Last name is required"),
     email: Yup.string().email("Invalid email address").required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    password: Yup.string()
+        .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
+        .matches(/[A-Za-z]/, "Password must contain at least one letter")
+        .matches(/[0-9]/, "Password must contain at least one number")
+        .required("Password is required"),
 });
 
 export default function SignupForm({ className, ...props }: React.ComponentProps<"form">) {

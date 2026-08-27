@@ -1,5 +1,5 @@
 import { getUser, signinUserAction, signoutUserAction, signupUserAction } from "./auth";
-import { enrollCourseAction, getAllCourseAction, getEnrolledCoursesAction, getOneCourseAction } from "./course";
+import { enrollCourseAction, getAllCourseAction, getEnrolledCourseAction, getEnrolledCoursesAction, getOneCourseAction } from "./course";
 
 export const actions = {
     auth: {
@@ -12,6 +12,7 @@ export const actions = {
         enrollCourseAction,
         getAllCourseAction,
         getOneCourseAction,
+        getEnrolledCourseAction,
         getEnrolledCoursesAction,
     },
 };

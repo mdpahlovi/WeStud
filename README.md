@@ -5,7 +5,7 @@ A modern online learning platform built with Next.js and Strapi CMS.
 ## 🚀 Live Demo
 
 - **🌐 Live Site:** https://we-stud.vercel.app
-- **⚙️ Admin Panel:** https://refreshing-renewal-6f66a388b1.strapiapp.com/admin
+- **⚙️ Admin Panel:** https://westud.mdpahlovi.com/admin
 
 ## 🛠️ Tech Stack
 

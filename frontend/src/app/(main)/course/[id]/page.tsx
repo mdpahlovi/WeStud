@@ -4,9 +4,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { resolveImage } from "@/lib/update";
 import { CheckCircle, Clock, Play } from "lucide-react";
 import markdown from "markdown-it";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 export default async function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -23,13 +23,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ i
     return (
         <div className="bg-gradient-to-br from-blue-50 via-white to-purple-50">
             <div className="relative h-96 overflow-hidden">
-                <Image
-                    src={`${process.env.SERVER_URL}${data.image.url}`}
-                    alt={data.title}
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-cover"
-                />
+                <img src={resolveImage(data.image.url)} alt={data.title} width={500} height={500} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 lg:container mx-auto p-6 lg:p-8 text-white">

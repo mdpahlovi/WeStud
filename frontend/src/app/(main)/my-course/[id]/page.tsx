@@ -5,11 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Clock, Play } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function MyCoursePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const { data } = await actions.course.getOneCourseAction(id);
+    const { data, success, message } = await actions.course.getEnrolledCourseAction(id);
+
+    if (!success && message === "Unauthorized") {
+        redirect("/signin");
+    }
 
     if (!data) {
         return notFound();
@@ -18,7 +22,7 @@ export default async function MyCoursePage({ params }: { params: Promise<{ id: s
     const totalClasses = data.modules.reduce((acc, module) => acc + (module.classes?.length || 0), 0);
     const totalDuration = data.modules.reduce(
         (acc, module) => acc + module.classes?.reduce((sum, cls) => sum + (cls.duration || 0), 0) || 0,
-        0
+        0,
     );
 
     return (

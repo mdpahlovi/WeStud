@@ -1,0 +1,28 @@
+# Root-level ignores. Per-package .gitignore files catch the bulk of artefacts,
+# but a root-level guard prevents accidental commits when running `git add .`
+# from the project root.
+
+# Never commit secrets or local env overrides.
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Build outputs (kept here as a safety net — each package also ignores these)
+node_modules/
+.next/
+out/
+build/
+dist/

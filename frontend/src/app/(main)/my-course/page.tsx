@@ -2,8 +2,8 @@ import { actions } from "@/app/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { resolveImage } from "@/lib/update";
 import { Clock, Library } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 export default async function MyCoursePage() {
@@ -17,8 +17,8 @@ export default async function MyCoursePage() {
                         <Card key={course.id} className="pt-0 overflow-hidden hover:shadow-lg transition-shadow">
                             <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/10 relative">
                                 {course.image?.url && (
-                                    <Image
-                                        src={`${process.env.SERVER_URL}${course.image.url}`}
+                                    <img
+                                        src={resolveImage(course.image.url)}
                                         alt={course.title}
                                         width={500}
                                         height={500}

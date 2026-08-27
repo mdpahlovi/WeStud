@@ -1,8 +1,8 @@
 "use server";
 
-import type { User } from "@/stores/useAuthStore";
 import { cookies } from "next/headers";
 import qs from "qs";
+import { verifyUserFromToken } from "./auth";
 
 const baseUrl = `${process.env.SERVER_URL}/api`;
 
@@ -70,7 +70,7 @@ export async function getAllCourseAction(): Promise<Response<Course[]>> {
                 pageSize: 12,
             },
         },
-        { encodeValuesOnly: true }
+        { encodeValuesOnly: true },
     );
 
     const response = await fetch(`${baseUrl}/courses?${queryParams}`, {
@@ -114,7 +114,7 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
                 },
             },
         },
-        { encodeValuesOnly: true }
+        { encodeValuesOnly: true },
     );
 
     const response = await fetch(`${baseUrl}/courses/${id}?${queryParams}`, {
@@ -134,13 +134,53 @@ export async function getOneCourseAction(id: string): Promise<Response<Course | 
     }
 }
 
-export async function enrollCourseAction({ user, course }: { user: User; course: Course }): Promise<Response> {
+/**
+ * Authenticated variant of getOneCourseAction. Verifies the caller holds a valid
+ * JWT and has an enrollment for the requested course before returning video
+ * URLs. Use this on any page that renders paid content.
+ */
+export async function getEnrolledCourseAction(id: string): Promise<Response<Course | null>> {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
+    const verified = await verifyUserFromToken(token);
+    if (!verified) {
+        return { success: false, message: "Unauthorized", data: null };
+    }
+
+    const enrolledCourseIds: number[] = (verified.enrollments || []).map((e: { course: { id: number } }) => e.course.id);
+
+    const { data: course, success, message } = await getOneCourseAction(id);
+    if (!success || !course) {
+        return { success: false, message, data: null };
+    }
+
+    if (!enrolledCourseIds.includes(course.id)) {
+        return { success: false, message: "Not enrolled in this course", data: null };
+    }
+
+    return { success: true, message: "Course fetched successfully", data: course };
+}
+
+export async function enrollCourseAction({ course }: { course: Course }): Promise<Response> {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    // Derive the user from the JWT — never trust client-sent identity.
+    const verified = await verifyUserFromToken(token);
+    if (!verified) {
+        return { success: false, message: "Unauthorized" };
+    }
+
+    // The UI hides the button, but a hand-crafted request can still hit this.
+    const alreadyEnrolled = (verified.enrollments || []).some((e: { course: { id: number } }) => e.course.id === course.id);
+    if (alreadyEnrolled) {
+        return { success: false, message: "Already enrolled in this course" };
+    }
+
     const enrollmentData = {
         data: {
-            user: user.id,
+            user: verified.id,
             course: course.id,
             price: course.price,
             enrolled_date: new Date().toISOString(),
@@ -171,6 +211,11 @@ export async function getEnrolledCoursesAction(): Promise<Response<Course[]>> {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
 
+    const verified = await verifyUserFromToken(token);
+    if (!verified) {
+        return { success: false, message: "Unauthorized", data: [] };
+    }
+
     const queryParams = qs.stringify(
         {
             fields: ["id", "documentId"],
@@ -193,7 +238,7 @@ export async function getEnrolledCoursesAction(): Promise<Response<Course[]>> {
                 },
             },
         },
-        { encodeValuesOnly: true }
+        { encodeValuesOnly: true },
     );
 
     const response = await fetch(`${baseUrl}/users/me?${queryParams}`, {

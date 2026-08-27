@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 export default function EnrollButton({ course }: { course: Course }) {
     const router = useRouter();
-    const { user } = useAuthStore();
+    const { user, setUser } = useAuthStore();
     const [loading, startTransition] = useTransition();
 
     if (user?.enrollments.some((e) => e.course.documentId === course.documentId)) {
@@ -30,13 +30,14 @@ export default function EnrollButton({ course }: { course: Course }) {
                         router.push("/signin");
                     } else {
                         startTransition(async () => {
-                            await actions.course.enrollCourseAction({ course: course, user: user }).then((res) => {
-                                if (res?.success) {
-                                    toast.success(res.message);
-                                } else {
-                                    toast.error(res.message);
-                                }
-                            });
+                            const res = await actions.course.enrollCourseAction({ course });
+                            if (res?.success) {
+                                toast.success(res.message);
+                                const updated = await actions.auth.getUser();
+                                setUser(updated);
+                            } else {
+                                toast.error(res.message);
+                            }
                         });
                     }
                 }}

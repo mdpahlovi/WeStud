@@ -17,8 +17,43 @@ type SigninUserActionProps = {
 
 const baseUrl = `${process.env.SERVER_URL}/api`;
 
+/**
+ * Never let a Server Action throw to the client (that renders as a raw 500);
+ * convert network/URL failures into a regular error response instead.
+ */
+async function strapiFetch(path: string, init?: RequestInit) {
+    if (!process.env.SERVER_URL) {
+        return {
+            ok: false,
+            status: 500,
+            json: async () => ({ error: { message: "Server is not configured (SERVER_URL missing)" } }),
+        } as Response;
+    }
+
+    try {
+        return await fetch(`${baseUrl}${path}`, init);
+    } catch (error) {
+        console.error(`[actions] Strapi request failed: ${path}`, error);
+        return {
+            ok: false,
+            status: 502,
+            json: async () => ({ error: { message: "Cannot reach the authentication server" } }),
+        } as Response;
+    }
+}
+
+const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
+
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: SESSION_MAX_AGE,
+};
+
 export async function signupUserAction({ firstName, lastName, email, password }: SignupUserActionProps) {
-    const response = await fetch(`${baseUrl}/auth/local/register`, {
+    const response = await strapiFetch("/auth/local/register", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -36,7 +71,7 @@ export async function signupUserAction({ firstName, lastName, email, password }:
         return { success: false, message: data?.error?.message || "Something went wrong" };
     } else {
         const cookieStore = await cookies();
-        cookieStore.set("token", data.jwt);
+        cookieStore.set("token", data.jwt, cookieOptions);
 
         const user = await getUserWithRole(data.jwt);
 
@@ -45,7 +80,7 @@ export async function signupUserAction({ firstName, lastName, email, password }:
 }
 
 export async function signinUserAction({ email, password }: SigninUserActionProps) {
-    const response = await fetch(`${baseUrl}/auth/local`, {
+    const response = await strapiFetch("/auth/local", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -59,10 +94,10 @@ export async function signinUserAction({ email, password }: SigninUserActionProp
     const data = await response.json();
 
     if (!response.ok) {
-        return { success: false, message: data?.error?.message || "Something went wrong" };
+        return { success: false, message: data?.error?.message || "Invalid email or password" };
     } else {
         const cookieStore = await cookies();
-        cookieStore.set("token", data.jwt);
+        cookieStore.set("token", data.jwt, cookieOptions);
 
         const user = await getUserWithRole(data.jwt);
 
@@ -86,6 +121,18 @@ export async function getUser() {
     return await getUserWithRole(token);
 }
 
+/**
+ * Verify a JWT by calling Strapi's /users/me with it. Returns the user on
+ * success, or null on failure (and clears the cookie). Use this in any server
+ * action that needs to trust the caller — never trust user data from the client.
+ */
+export async function verifyUserFromToken(token: string | undefined) {
+    if (!token) {
+        return null;
+    }
+    return await getUserWithRole(token);
+}
+
 async function getUserWithRole(token: string) {
     const queryParams = qs.stringify(
         {
@@ -101,10 +148,10 @@ async function getUserWithRole(token: string) {
                 },
             },
         },
-        { encodeValuesOnly: true }
+        { encodeValuesOnly: true },
     );
 
-    const response = await fetch(`${baseUrl}/users/me?${queryParams}`, {
+    const response = await strapiFetch(`/users/me?${queryParams}`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },
