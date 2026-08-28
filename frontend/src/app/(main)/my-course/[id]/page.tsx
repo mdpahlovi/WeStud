@@ -28,7 +28,7 @@ export default async function MyCoursePage({ params }: { params: Promise<{ id: s
     return (
         <section className="lg:container mx-auto p-6 lg:p-8 grid gap-6">
             <Card className="py-0 overflow-hidden gap-0">
-                {data.modules[0].classes[0].video.url && (
+                {data.modules?.at(0)?.classes?.at(0)?.video?.url && (
                     <video
                         src={`${process.env.SERVER_URL}${data.modules[0].classes[0].video.url}`}
                         controls

@@ -1,10 +1,7 @@
 import type { Core } from "@strapi/types";
 
 /**
- * Roles live in code so the security posture is reviewable and reproducible.
- * Strapi's role-based permissions are normally configured through the admin UI
- * and stored in the DB; this hook seeds the canonical set on every boot,
- * idempotently.
+ * Canonical roles, seeded idempotently on every boot (instead of via the admin UI).
  */
 const ROLES = [
     {
@@ -94,10 +91,20 @@ export default {
 };
 
 async function seedRolesAndPermissions(strapi: Core.Strapi) {
-    // Uses the DB query layer directly; the users-permissions services in
-    // Strapi 5 don't expose the methods needed here.
+    // Strapi 5's users-permissions services don't expose what's needed, so use
+    // the DB query layer directly.
     const roleQuery = strapi.db.query("plugin::users-permissions.role");
     const permissionQuery = strapi.db.query("plugin::users-permissions.permission");
+
+    // Registrations land on default_role; it must be a seeded role, otherwise
+    // /users/me 403s right after login.
+    const DEFAULT_SIGNUP_ROLE = "student";
+    const pluginStore = strapi.store({ type: "plugin", name: "users-permissions" });
+    const advanced = ((await pluginStore.get({ key: "advanced" })) as Record<string, unknown>) ?? {};
+    if (advanced.default_role !== DEFAULT_SIGNUP_ROLE) {
+        await pluginStore.set({ key: "advanced", value: { ...advanced, default_role: DEFAULT_SIGNUP_ROLE } });
+        strapi.log.info(`[bootstrap] default_role set to "${DEFAULT_SIGNUP_ROLE}"`);
+    }
 
     for (const roleDef of ROLES) {
         let role = await roleQuery.findOne({
@@ -134,9 +141,7 @@ async function seedRolesAndPermissions(strapi: Core.Strapi) {
             if (!desiredActions.has(p.action)) {
                 try {
                     await permissionQuery.delete({ where: { id: p.id } });
-                } catch {
-                    /* ignore */
-                }
+                } catch {}
             }
         }
     }

@@ -15,7 +15,7 @@ export default function MenuButton() {
     if (user) {
         return (
             <div className="flex items-center">
-                {user?.role?.name === "Student" && user?.enrollments?.length ? (
+                {user?.enrollments?.length ? (
                     <Button variant="ghost" className={pathname.includes("/my-course") ? "underline" : ""} asChild>
                         <Link href="/my-course">My Courses</Link>
                     </Button>

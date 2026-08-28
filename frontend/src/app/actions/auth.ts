@@ -18,8 +18,7 @@ type SigninUserActionProps = {
 const baseUrl = `${process.env.SERVER_URL}/api`;
 
 /**
- * Never let a Server Action throw to the client (that renders as a raw 500);
- * convert network/URL failures into a regular error response instead.
+ * Never let a Server Action throw to the client (renders as a raw 500).
  */
 async function strapiFetch(path: string, init?: RequestInit) {
     if (!process.env.SERVER_URL) {
@@ -73,7 +72,11 @@ export async function signupUserAction({ firstName, lastName, email, password }:
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, cookieOptions);
 
-        const user = await getUserWithRole(data.jwt);
+        const user = await getUserWithRole(data.jwt, { clearOnError: false });
+
+        if (!user) {
+            return { success: false, message: "Signed up, but the profile could not be loaded. Please try signing in." };
+        }
 
         return { success: true, message: "User signed up successfully", data: user };
     }
@@ -99,7 +102,11 @@ export async function signinUserAction({ email, password }: SigninUserActionProp
         const cookieStore = await cookies();
         cookieStore.set("token", data.jwt, cookieOptions);
 
-        const user = await getUserWithRole(data.jwt);
+        const user = await getUserWithRole(data.jwt, { clearOnError: false });
+
+        if (!user) {
+            return { success: false, message: "Signed in, but the profile could not be loaded. Please try again." };
+        }
 
         return { success: true, message: "User signed in successfully", data: user };
     }
@@ -122,9 +129,7 @@ export async function getUser() {
 }
 
 /**
- * Verify a JWT by calling Strapi's /users/me with it. Returns the user on
- * success, or null on failure (and clears the cookie). Use this in any server
- * action that needs to trust the caller — never trust user data from the client.
+ * Verify a JWT via /users/me; clears the session cookie on failure.
  */
 export async function verifyUserFromToken(token: string | undefined) {
     if (!token) {
@@ -133,7 +138,7 @@ export async function verifyUserFromToken(token: string | undefined) {
     return await getUserWithRole(token);
 }
 
-async function getUserWithRole(token: string) {
+async function getUserWithRole(token: string, { clearOnError = true }: { clearOnError?: boolean } = {}) {
     const queryParams = qs.stringify(
         {
             populate: {
@@ -160,8 +165,10 @@ async function getUserWithRole(token: string) {
     const data = await response.json();
 
     if (!response.ok) {
-        const cookieStore = await cookies();
-        cookieStore.delete("token");
+        if (clearOnError) {
+            const cookieStore = await cookies();
+            cookieStore.delete("token");
+        }
         return null;
     } else {
         return data;

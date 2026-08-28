@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
             },
             {
                 protocol: "https",
-                hostname: "refreshing-renewal-6f66a388b1.strapiapp.com",
+                hostname: "westud.mdpahlovi.com",
                 port: "",
                 pathname: "/uploads/**",
             },
